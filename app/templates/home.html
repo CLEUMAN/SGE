@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}
+SGE - Dashboard
+{% endblock %}
+
+{% block content %}
+<script src=" https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="container mt-4">
+    <h3 class="display-6">Dashboard</h3>
+    <div class="">
+        {% if perms.products.view_product and perms.inflows.view_inflow %}
+            {% include 'components/_product_metrics.html' %}
+        {% endif %}
+
+        {% if perms.outflows.view_outflow %}
+            {% include 'components/_sales_metrics.html' %}
+        {% endif %}
+
+        {% if perms.outflows.view_outflow %}
+        <div class="row mt-4 justify-content-center">
+            <div class="col-md-6">
+                <h5 class="text-center mb-3">Valor de vendas últimos 7 dias</h5>
+                <canvas id="dailySalesChart"></canvas>
+            </div>
+            <div class="col-md-6">
+                <h5 class="text-center mb-3">Quantidade de vendas diárias</h5>
+                <canvas id="dailySalesQuantityChart"></canvas>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if perms.products.view_product and perms.inflows.view_inflow %}
+        <div class="row mt-4 justify-content-center">
+            <div class="col-md-6">
+                <h5 class="text-center mb-3">Produtos por Categorias</h5>
+                <div class="embed-responsive embed-responsive-1by1" style="display: inline-block">
+                    <canvas id="productByCategoryChart" class="embed-responsive-item"></canvas>
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                <h5 class="text-center mb-3">Produtos por Marca</h5>
+                <div class="embed-responsive embed-responsive-1by1" style="display: inline-block">
+                    <canvas id="productByBrandChart" class="embed-responsive-item"></canvas>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% if perms.outflows.view_outflow %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const dailySalesData = JSON.parse('{{ daily_sales_data|safe }}')
+        const dailySalesQuantityData = JSON.parse('{{daily_sales_quantity_data|safe}}')
+
+        var ctxDailySales = document.getElementById('dailySalesChart').getContext('2d');
+        var dailySalesChart = new Chart(ctxDailySales, {
+            type: 'line',
+            data: {
+                labels: dailySalesData.dates,
+                datasets: [{
+                    label: 'Valor de vendas',
+                    data: dailySalesData.values,
+                    fill: false,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    tension: 0.5
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        var ctxDailyQuantitySales = document.querySelector('#dailySalesQuantityChart').getContext('2d');
+        var dailySalesQuantityChart = new Chart(ctxDailyQuantitySales, {
+            type: 'bar',
+            data: {
+                labels: dailySalesQuantityData.dates,
+                datasets: [{
+                    label: 'Valor de vendas diária',
+                    data: dailySalesQuantityData.values,
+                    fill: false,
+                    borderColor: 'rgba(055, 99, 132, 1)',
+                    backgroundColor: 'rgba(055, 99, 132, 0.6)',
+                    borderWidth: 1,
+                    tension: 0.5
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+
+    });
+</script>
+{% endif %}
+
+{% if perms.products.view_product and perms.inflows.view_inflow %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const productCountByCategory = JSON.parse('{{ product_count_by_category|safe }}')
+        const productCountByBrand = JSON.parse('{{product_count_by_category|safe}}')
+
+        var ctxCategory = document.getElementById('productByCategoryChart').getContext('2d');
+        var dailySalesChart = new Chart(ctxCategory, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(productCountByCategory),
+                datasets: [{
+                    data: Object.values(productCountByCategory),
+                    borderWidth: 2,
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        var ctxBrand = document.querySelector('#productByBrandChart').getContext('2d');
+        var productByBrandChart = new Chart(ctxBrand, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(productCountByCategory),
+                datasets: [{
+                    data: Object.values(productCountByCategory),
+                    borderWidth: 2,
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+
+    });
+</script>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}
+SGE - Saídas
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h3 class="display-6">Cadastrar Saída</h3>
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="" class="form">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary">Registrar Saída</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="text-end">
+        <a href="{% url 'outflow_list' %}" class="btn btn-secondary mt-3">Cancelar e voltar para lista de Saída</a>
+    </div>
+
+</div>
+
+{% endblock %}
