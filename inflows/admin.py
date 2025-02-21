@@ -3,7 +3,7 @@ from . import models
 
 
 class InflowAdmin(admin.ModelAdmin):
-    list_display = ('supplier', 'product', 'quantity', 'created_at', 'update_at',)
+    list_display = ('supplier', 'product', 'quantity', 'created_at', 'updated_at',)
     search_fields = ('supplier_name', 'product_title')
 
 admin.site.register(models.Inflow, InflowAdmin)
